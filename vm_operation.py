@@ -286,14 +286,14 @@ class VMoperation(Logger):
                 "items": [
                 {
                     "key": "ssh-keys",
-                    "value": "bitsuser:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDASoppjmWU8y0JBQir8gvr3rxcJdFBh6gIJtsflbWi90I6ozO0+mk894JFoosTj073GPafzLOQt3Ybz7gvLGX9CqkMr0q4H32To1rlgaGkdq6x4+e7D9Bk9NViF4dVYmoac2oTLz+6eJl4h/y5GcOlKcTQjKCgZAxjY51oVNpEFO2r5SMgbRv3x0UhxG64FrRjUAw67WmkOzALc2BF6nd1l7YqDLaCb/pAq/lXknpX/QYpLCtetAPjgO2O4UDY534gz3X2tjMNpm1aY3fCaN2lmTGURqrBQ9bgaQ6i8FR3rd8I8hMxR4F/CDVjR85ZIx3knMk7zObQMMJUlEnFB+mzaN8ml3aGUsLo7EeiCrudMXUYwWeVjldyVeqlNkVC8Iv+Pkbfcv2m7yi8CWgf8OM6wrkS1NJSg75wYCP+Q1QTnvFRr5BwBW8DuN91nQr9V4XkUqyw8Z8C4E8Ndmo9dxEEtOvKvOib/gyVsRujQhFVluYin7Qee1PR2ziKwHvYG6s= bitsuser\nomarfaruk:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDjln46qet+cDsOStm/S2xldsfi5OM3CYWrdaG9nBkfU6yoFnkUVYYYX3bIwWpwHM+DA2yLYIcEpD1n9V9X2k4TnCzVPsGDBE2qCj72/Zr06QDLcTyYcZ6tfbCzgy9/h5bbOByWCCHB3xrhBX/6cJFW4AIrTJjAcfkZth4GMwZ6iCnk+lXtP3Da+T+E0Oc5Sdj8o1l7nmztNHWBLklBc7rrpeCKISqkMwPMi+59GoxyZg3MZYdH245tdQVzztEuR1JdvQEqhkrcli20LMlt2wBg2HfopKFPVgag/wN6udGc+KRq2g8tv6ebBEOALjYLIBapxmCvqNIIiftVFTsPF1IZ omarfaruk"
+                    "value": "user1:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDASoppjmWU8y0JBQir8gvr3rxcJdFBh6gIJtsflbWi90I6ozO0+mk894JFoosTj073GPafzLOQt3Ybz7gvLGX9CqkMr0q4H32To1rlgaGkdq6x4+e7D9Bk9NViF4dVYmoac2oTLz+6eJl4h/y5GcOlKcTQjKCgZAxjY51oVNpEFO2r5SMgbRv3x0UhxG64FrRjUAw67WmkOzALc2BF6nd1l7YqDLaCb/pAq/lXknpX/QYpLCtetAPjgO2O4UDY534gz3X2tjMNpm1aY3fCaN2lmTGURqrBQ9bgaQ6i8FR3rd8I8hMxR4F/CDVjR85ZIx3knMk7zObQMMJUlEnFB+mzaN8ml3aGUsLo7EeiCrudMXUYwWeVjldyVeqlNkVC8Iv+Pkbfcv2m7yi8CWgf8OM6wrkS1NJSg75wYCP+Q1QTnvFRr5BwBW8DuN91nQr9V4XkUqyw8Z8C4E8Ndmo9dxEEtOvKvOib/gyVsRujQhFVluYin7Qee1PR2ziKwHvYG6s= bitsuser\nomarfaruk:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDjln46qet+cDsOStm/S2xldsfi5OM3CYWrdaG9nBkfU6yoFnkUVYYYX3bIwWpwHM+DA2yLYIcEpD1n9V9X2k4TnCzVPsGDBE2qCj72/Zr06QDLcTyYcZ6tfbCzgy9/h5bbOByWCCHB3xrhBX/6cJFW4AIrTJjAcfkZth4GMwZ6iCnk+lXtP3Da+T+E0Oc5Sdj8o1l7nmztNHWBv6ebBEOALjYLIBapxmCvqNIIiftVFTsPF1IZ user1"
                 }
                 ]
         },
         "tags": {
             "items": [
-            "allow-ssh-bit",
-            "allow-ssh-brac"
+            "allow-ssh",
+            "allow-db"
             ]
         }
         }
