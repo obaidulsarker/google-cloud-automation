@@ -3,11 +3,11 @@ import csv
 
 # Database connection parameters
 db_params = {
-    'host': '10.42.53.28',
-    'port': '4590',
-    'database': 'sbicloud_bd_250602',
+    'host': 'xx.xx.xx.xx',
+    'port': 'xxxx',
+    'database': 'sample_db',
     'user': 'enterprisedb',
-    'password': 'bRacit@MfUaT#9893#'
+    'password': 'xxxxxxxxxxx'
 }
 
 # Function to calculate the level of foreign key hierarchy
