@@ -1,0 +1,13 @@
+version: '3'
+services:
+  myapp:
+    build:
+      context: .  # Build context is the current directory
+      dockerfile: Dockerfile-notification  # Use the Dockerfile named "Dockerfile-Notification"
+    volumes:
+      - /app/logs:/app/logs  # Mount logs
+      - /app/cred:/app/cred  # Mount GCP service account file
+      - /app/data:/app/data # operation database location
+      - /app/data:/app/conf # configiguration file
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/cred/service-account-key.json  # Add environment variables if needed

@@ -1,0 +1,33 @@
+drop table operation;
+drop table operation_details;
+
+CREATE TABLE operation(
+	operation_id VARCHAR(128) NOT NULL,
+	start_datetime	text NOT NULL,
+	end_datetime	text,
+	total_duration text,
+	operation_status	VARCHAR(20) NOT NULL,
+	source_database_vm_name VARCHAR(128) NOT NULL,
+	source_database_vm_ip VARCHAR(20) NOT null,
+	total_tasks		INTEGER NOT NULL,
+	total_passed_tasks	INTEGER,
+	output_dump_file text,
+	output_data_disk_snapshot text
+);
+
+
+CREATE TABLE operation_details(
+	operation_id VARCHAR(128) NOT null,
+	task_id	INTEGER,
+	task_name VARCHAR(100) not null,
+	task_description text not null,
+	task_start_datetime text NOT NULL,
+	task_end_datetime	text,
+	task_duration text,
+	task_status VARCHAR(20),	
+	remarks	text
+);
+
+CREATE INDEX IF NOT EXISTS indx_operation ON operation_details(operation_id);
+
+CREATE INDEX IF NOT EXISTS indx_operation_details ON operation_details(operation_id,task_id);

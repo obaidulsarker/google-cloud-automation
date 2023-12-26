@@ -1,0 +1,28 @@
+<todo>
+    <task taskno="1" name="Connect_Google_Cloud" status="Pending">Test Google cloud connection</task>
+    <task taskno="2" name="Connect_Google_Storage" status="Pending">Test Google cloud Storage connection</task>
+    <task taskno="3" name="Create_Machine_Image" status="Pending">Create Source Machine Image Backup</task>
+    <task taskno="4" name="Create_Compute_Instance" status="Pending">Create Compute Instance from the Machine Image</task>
+    <task taskno="5" name="Connect_New_Instance_By_SSH" status="Pending">Connect To new Virtaul Machine by SSH Credential</task>
+    <task taskno="6" name="Mount_Data_Disk" status="Pending">Mount Data Disk to New VM, if it is not mounted</task>
+    <task taskno="7" name="Remove_Recovery_Conf_File" status="Pending">Remove recovery.conf file from database directory</task>
+    <task taskno="8" name="Start_Database_Service" status="Pending">Start Database Service</task>
+    <task taskno="9" name="Test_Database_Connection" status="Pending">Test Database Connection</task>
+    <task taskno="10" name="Configure_Database_Parameters" status="Pending">Configure Database Paramters</task>
+    <task taskno="11" name="Restart_Database_Service" status="Pending">Restart Database Service</task>
+    <task taskno="12" name="Take_Dump_Backup_Public_SchemaOnly" status="Pending">Take dump backup of public Schema without data</task>
+    <task taskno="13" name="Take_Dump_Backup_Archive_SchemaOnly" status="Pending">Take dump backup of archive Schema without data</task>
+    <task taskno="14" name="Rename_Public_Schema" status="Pending">Rename Public Schema to public_original</task>
+    <task taskno="15" name="Rename_Archive_Schema" status="Pending">Rename Archive Schema to archive_original</task>
+    <task taskno="16" name="Restore_Public_Schema_Dump" status="Pending">Restore public schema from dump backup</task>
+    <task taskno="17" name="Restore_Archive_Schema_Dump" status="Pending">Restore archive schema from dump backup</task>
+    <task taskno="18" name="Execute_Xml_Sql" status="Pending">Execute Schema rename and SmallDB preparation procedure from sql.xml file</task>
+    <task taskno="19" name="Drop_Schema" status="Pending">Drop all user schema excluding public and archive</task>
+    <task taskno="20" name="Take_Dump_Backup_Public_Schema" status="Pending">Take Dump backup of public schema with data</task>
+    <task taskno="21" name="Take_Dump_Backup_Archive_Schema" status="Pending">Take Dump backup of archive schema with data</task>
+    <task taskno="22" name="Upload_Public_Schema_Dump" status="Pending">Upload Dump backup of public schema to Cloud Storage</task>
+    <task taskno="23" name="Upload_Archive_Schema_Dump" status="Pending">Upload Dump backup of archive schema to Cloud Storage</task>
+    <task taskno="24" name="Take_Snapshot_Data_Disk" status="Pending">Take Snapshot of Data Disk</task>
+    <task taskno="25" name="Remove_Machine_Image" status="Pending">Remove Machine Image Backup</task>
+    <task taskno="26" name="Remove_Compute_Instance" status="Pending">Delete the Created Compute Instance</task>
+</todo>

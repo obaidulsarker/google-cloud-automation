@@ -1,0 +1,30 @@
+<params>
+    <variables>
+        <memory>
+            <param name="shared_buffers">0.5</param>
+            <param name="effective_cache_size">0.3</param>
+            <param name="max_wal_size">0.1</param>
+            <param name="min_wal_size">0.15</param>
+        </memory>
+	<cpu>
+		<param name="max_worker_processes">0.8</param>
+		<param name="max_parallel_workers">0.7</param>
+		<param name="max_parallel_maintenance_workers">0.25</param>
+		<param name="max_parallel_workers_per_gather">0.25</param>
+        </cpu>
+    </variables>
+    <fixed>
+        <param name="listen_addresses">*</param>
+        <param name="max_connections">100</param>
+        <param name="work_mem">4GB</param>
+        <param name="statement_timeout">0</param>
+        <param name="lock_timeout">0</param>
+        <param name="idle_in_transaction_session_timeout">0</param>
+        <param name="archive_mode">off</param>
+        <param name="synchronous_standby_names"> </param>
+        <param name="synchronous_commit">off</param>
+        <param name="temp_buffers">512MB</param>
+        <param name="effective_io_concurrency">50</param>
+        <param name="autovacuum">off</param>
+    </fixed>
+</params>

@@ -1,0 +1,12 @@
+<sql>
+    <query name="ddl">ALTER SCHEMA public RENAME TO smalldb;</query>
+    <query name="ddl">ALTER SCHEMA archive RENAME TO smalldb_archive;</query>
+    <query name="ddl">ALTER SCHEMA public_original RENAME TO public;</query>
+    <query name="ddl">ALTER SCHEMA archive_original RENAME TO archive;</query>
+    <query name="dml">INSERT INTO smalldb.smalldb_office_list SELECT * FROM public.smalldb_office_list;</query>
+    <query name="ddl">ALTER SCHEMA public RENAME TO public_original;</query>
+    <query name="ddl">ALTER SCHEMA archive RENAME TO archive_original;</query>
+    <query name="ddl">ALTER SCHEMA smalldb RENAME TO public;</query>
+    <query name="ddl">ALTER SCHEMA smalldb_archive RENAME TO archive;</query>
+    <query name="procedure" exec_type="shell">CALL sp_smdb_validation_sequence_update_main();</query>
+</sql>

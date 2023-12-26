@@ -1,0 +1,14 @@
+<sql>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA public RENAME TO smalldb;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA archive RENAME TO archive_smalldb;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA public_original RENAME TO public;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA archive_original RENAME TO archive;</query>
+    <query name="dml" exec_type="sql">UPDATE smalldb_office_list SET month_start_date=TO_CHAR(DATE_TRUNC('month', CURRENT_DATE),'yyyy-mm-dd')::timestamp without time zone, month_end_date=TO_CHAR((DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month - 1 day'),'yyyy-mm-dd')::timestamp without time zone</query>
+    <query name="procedure" exec_type="shell">call sp_smdb_consolidated_main();</query>
+    <query name="dml" exec_type="sql">INSERT INTO smalldb.smalldb_office_list SELECT * FROM public.smalldb_office_list;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA public RENAME TO public_original;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA archive RENAME TO archive_original;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA smalldb RENAME TO public;</query>
+    <query name="ddl" exec_type="sql">ALTER SCHEMA archive_smalldb RENAME TO archive;</query>
+    <query name="shell" exec_type="shell">sudo systemctl restart edb-as-11</query>
+</sql>
