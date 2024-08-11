@@ -1,0 +1,206 @@
+
+********* Operation: 3853d4a6-1de2-4751-9116-cabf4392e7b5 ***********
+********* Started at: 2023-11-30_12-30-11 *************************
+2023-11-30 12:30:11,840 [INFO]: **************************Jobs are started **********************************
+2023-11-30 12:30:11,840 [INFO]: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2023-11-30 12:30:17,406 [INFO]: ===============================================================
+2023-11-30 12:30:17,407 [INFO]: Task # 1, Task Name : Connect_Google_Cloud, Status : In Progress
+2023-11-30 12:30:17,407 [INFO]: Test Google cloud connection
+2023-11-30 12:30:17,648 [INFO]: GCP connection is successful.
+2023-11-30 12:30:17,649 [INFO]: Task # 1, Task Name : Connect_Google_Cloud, Status : Completed, Elapse Duration: 00:00:00
+2023-11-30 12:30:17,649 [INFO]: **********************************************************************************************
+2023-11-30 12:30:27,665 [INFO]: Total Elapse Duration: 00:00:00
+2023-11-30 12:30:29,637 [INFO]: ===============================================================
+2023-11-30 12:30:29,637 [INFO]: Task # 2, Task Name : Connect_Google_Storage, Status : In Progress
+2023-11-30 12:30:29,638 [INFO]: Test Google cloud Storage connection
+2023-11-30 12:30:29,640 [INFO]: Task # 2, Task Name : Connect_Google_Storage, Status : Completed, Elapse Duration: 00:00:00
+2023-11-30 12:30:29,640 [INFO]: **********************************************************************************************
+2023-11-30 12:30:39,645 [INFO]: Total Elapse Duration: 00:00:00
+2023-11-30 12:30:41,471 [INFO]: ===============================================================
+2023-11-30 12:30:41,471 [INFO]: Task # 3, Task Name : Create_Machine_Image, Status : In Progress
+2023-11-30 12:30:41,471 [INFO]: Create Source Machine Image Backup
+2023-11-30 12:30:48,397 [INFO]: Creating Machine Image of small-db-1 VM...
+2023-11-30 12:30:49,704 [INFO]: Creating Machine Image of small-db-1 VM...
+2023-11-30 12:31:50,946 [INFO]: Created Machine Image: vm-img-small-db-1-20231130123041 successfully
+2023-11-30 12:32:50,961 [INFO]: Task # 3, Task Name : Create_Machine_Image, Status : Completed, Elapse Duration: 00:02:09
+2023-11-30 12:32:50,961 [INFO]: **********************************************************************************************
+2023-11-30 12:33:00,967 [INFO]: Total Elapse Duration: 00:02:09
+2023-11-30 12:33:02,774 [INFO]: ===============================================================
+2023-11-30 12:33:02,775 [INFO]: Task # 4, Task Name : Create_Compute_Instance, Status : In Progress
+2023-11-30 12:33:02,775 [INFO]: Create Compute Instance from the Machine Image
+2023-11-30 12:33:05,039 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:35:05,949 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:36:07,274 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:37:08,670 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:38:10,069 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:39:11,180 [INFO]: Creating smalldb-20231130123302 Compute Instance...
+2023-11-30 12:40:12,024 [INFO]: Created Compute Instance: smalldb-20231130123302
+2023-11-30 12:41:12,044 [INFO]: Task # 4, Task Name : Create_Compute_Instance, Status : Completed, Elapse Duration: 00:08:09
+2023-11-30 12:41:12,045 [INFO]: **********************************************************************************************
+2023-11-30 12:41:22,054 [INFO]: Total Elapse Duration: 00:10:18
+2023-11-30 12:41:24,290 [INFO]: ===============================================================
+2023-11-30 12:41:24,291 [INFO]: Task # 5, Task Name : Connect_New_Instance_By_SSH, Status : In Progress
+2023-11-30 12:41:24,291 [INFO]: Connect To new Virtaul Machine by SSH Credential
+2023-11-30 12:46:26,042 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:27,647 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:28,849 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:29,522 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:29,999 [INFO]: New Instance IP address: 10.150.150.23
+2023-11-30 12:46:29,999 [INFO]: New Instance Configuration: CPU - 16 core, RAM - 126GB
+2023-11-30 12:46:30,282 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:30,988 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:31,430 [INFO]: SSH Connection is successful!
+2023-11-30 12:46:31,430 [INFO]: SSH Connection on vm-img-small-db-1-20231130123041 VM is successfull.
+2023-11-30 12:46:31,431 [INFO]: Task # 5, Task Name : Connect_New_Instance_By_SSH, Status : Completed, Elapse Duration: 00:05:07
+2023-11-30 12:46:31,431 [INFO]: **********************************************************************************************
+2023-11-30 12:46:41,442 [INFO]: Total Elapse Duration: 00:15:26
+2023-11-30 12:46:43,353 [INFO]: ===============================================================
+2023-11-30 12:46:43,353 [INFO]: Task # 6, Task Name : Mount_Data_Disk, Status : In Progress
+2023-11-30 12:46:43,353 [INFO]: Mount Data Disk to New VM, if it is not mounted
+2023-11-30 12:46:43,639 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:44,331 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:45,014 [INFO]: Command executed: sudo lsblk -d -o NAME | grep -v 'sda' |  grep -v 'NAME'
+2023-11-30 12:46:45,278 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:46,021 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:46,483 [INFO]: Command executed: sudo lsblk --noheadings --output NAME | grep sdb
+2023-11-30 12:46:46,834 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:46:47,508 [INFO]: Authentication (password) successful!
+2023-11-30 12:46:47,990 [INFO]: Command executed: findmnt -rno SOURCE,TARGET | grep sdb1
+2023-11-30 12:46:47,991 [INFO]: mount status of device sdb1 = True
+2023-11-30 12:46:48,023 [INFO]: Device sdb1 already mounted to /data
+2023-11-30 12:46:48,024 [INFO]: Data disk mounted: /data
+2023-11-30 12:46:48,026 [INFO]: Task # 6, Task Name : Mount_Data_Disk, Status : Completed, Elapse Duration: 00:00:04
+2023-11-30 12:46:48,026 [INFO]: **********************************************************************************************
+2023-11-30 12:46:58,036 [INFO]: Total Elapse Duration: 00:15:30
+2023-11-30 12:46:59,804 [INFO]: ===============================================================
+2023-11-30 12:46:59,804 [INFO]: Task # 7, Task Name : Remove_Recovery_Conf_File, Status : In Progress
+2023-11-30 12:46:59,804 [INFO]: Remove recovery.conf file from database directory
+2023-11-30 12:46:59,828 [INFO]: Command executing: sudo rm -rf /data/edb/as11/data/recovery.conf
+2023-11-30 12:47:00,528 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:01,411 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:01,934 [INFO]: Command executed: sudo rm -rf /data/edb/as11/data/recovery.conf
+2023-11-30 12:47:02,268 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:03,003 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:03,586 [INFO]: [chan 0] Opened sftp connection (server version 3)
+2023-11-30 12:47:04,165 [INFO]: Command executing: sudo rm /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:04,694 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:05,419 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:05,899 [INFO]: Command executed: sudo rm /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:05,900 [INFO]: Command executing: sudo cp /tmp/pg_hba.conf /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:06,164 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:06,891 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:07,351 [INFO]: Command executed: sudo cp /tmp/pg_hba.conf /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:07,401 [INFO]: Command executing: sudo chown enterprisedb:enterprisedb /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:07,703 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:08,414 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:08,861 [INFO]: Command executed: sudo chown enterprisedb:enterprisedb /data/edb/as11/data/pg_hba.conf
+2023-11-30 12:47:08,905 [INFO]: Command executing: sudo systemctl restart edb-as-11
+2023-11-30 12:47:09,210 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:09,925 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:43,850 [INFO]: Command executed: sudo systemctl restart edb-as-11
+2023-11-30 12:47:43,851 [INFO]: Recovery file is removed successfully.
+2023-11-30 12:47:43,852 [INFO]: Task # 7, Task Name : Remove_Recovery_Conf_File, Status : Completed, Elapse Duration: 00:00:44
+2023-11-30 12:47:43,853 [INFO]: **********************************************************************************************
+2023-11-30 12:47:53,869 [INFO]: Total Elapse Duration: 00:16:14
+2023-11-30 12:47:56,007 [INFO]: ===============================================================
+2023-11-30 12:47:56,008 [INFO]: Task # 8, Task Name : Start_Database_Service, Status : In Progress
+2023-11-30 12:47:56,008 [INFO]: Start Database Service
+2023-11-30 12:47:56,777 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:47:57,766 [INFO]: Authentication (password) successful!
+2023-11-30 12:47:58,174 [INFO]: Command executed: systemctl is-active edb-as-11
+2023-11-30 12:47:58,175 [INFO]: Database service is started successfully.
+2023-11-30 12:47:58,176 [INFO]: Task # 8, Task Name : Start_Database_Service, Status : Completed, Elapse Duration: 00:00:02
+2023-11-30 12:47:58,176 [INFO]: **********************************************************************************************
+2023-11-30 12:48:08,179 [INFO]: Total Elapse Duration: 00:16:17
+2023-11-30 12:48:10,250 [INFO]: ===============================================================
+2023-11-30 12:48:10,250 [INFO]: Task # 9, Task Name : Test_Database_Connection, Status : In Progress
+2023-11-30 12:48:10,250 [INFO]: Test Database Connection
+2023-11-30 12:53:12,225 [INFO]: Command executing: DB User's Password Reset
+2023-11-30 12:53:12,850 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:53:13,833 [INFO]: Authentication (password) successful!
+2023-11-30 12:53:14,591 [INFO]: Command executed: DB User's Password Reset
+2023-11-30 12:53:14,592 [INFO]: Database connection is successful.
+2023-11-30 12:53:14,595 [INFO]: Task # 9, Task Name : Test_Database_Connection, Status : Completed, Elapse Duration: 00:05:04
+2023-11-30 12:53:14,595 [INFO]: **********************************************************************************************
+2023-11-30 12:53:24,605 [INFO]: Total Elapse Duration: 00:21:21
+2023-11-30 12:53:27,312 [INFO]: ===============================================================
+2023-11-30 12:53:27,312 [INFO]: Task # 10, Task Name : Configure_Database_Parameters, Status : In Progress
+2023-11-30 12:53:27,312 [INFO]: Configure Database Paramters
+2023-11-30 12:53:27,598 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:53:28,284 [INFO]: Authentication (password) successful!
+2023-11-30 12:53:29,025 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:53:29,667 [INFO]: Authentication (password) successful!
+2023-11-30 12:53:30,258 [INFO]: parma_name=shared_buffers, param value=0.5
+2023-11-30 12:53:30,259 [INFO]: Executing : ALTER SYSTEM SET shared_buffers = '63GB';
+2023-11-30 12:53:31,148 [INFO]: Executed : ALTER SYSTEM SET shared_buffers = '63GB';
+2023-11-30 12:53:31,149 [INFO]: parma_name=effective_cache_size, param value=0.3
+2023-11-30 12:53:31,149 [INFO]: Executing : ALTER SYSTEM SET effective_cache_size = '37GB';
+2023-11-30 12:53:32,023 [INFO]: Executed : ALTER SYSTEM SET effective_cache_size = '37GB';
+2023-11-30 12:53:32,024 [INFO]: parma_name=max_wal_size, param value=0.1
+2023-11-30 12:53:32,025 [INFO]: Executing : ALTER SYSTEM SET max_wal_size = '12GB';
+2023-11-30 12:53:32,843 [INFO]: Executed : ALTER SYSTEM SET max_wal_size = '12GB';
+2023-11-30 12:53:32,845 [INFO]: parma_name=min_wal_size, param value=0.15
+2023-11-30 12:53:32,846 [INFO]: Executing : ALTER SYSTEM SET min_wal_size = '18GB';
+2023-11-30 12:53:33,680 [INFO]: Executed : ALTER SYSTEM SET min_wal_size = '18GB';
+2023-11-30 12:53:33,682 [INFO]: parma_name=max_worker_processes, param value=0.8
+2023-11-30 12:53:33,683 [INFO]: Executing : ALTER SYSTEM SET max_worker_processes = '12';
+2023-11-30 12:53:34,530 [INFO]: Executed : ALTER SYSTEM SET max_worker_processes = '12';
+2023-11-30 12:53:34,532 [INFO]: parma_name=max_parallel_workers, param value=0.7
+2023-11-30 12:53:34,532 [INFO]: Executing : ALTER SYSTEM SET max_parallel_workers = '11';
+2023-11-30 12:53:35,293 [INFO]: Executed : ALTER SYSTEM SET max_parallel_workers = '11';
+2023-11-30 12:53:35,295 [INFO]: parma_name=max_parallel_maintenance_workers, param value=0.25
+2023-11-30 12:53:35,296 [INFO]: Executing : ALTER SYSTEM SET max_parallel_maintenance_workers = '4';
+2023-11-30 12:53:36,054 [INFO]: Executed : ALTER SYSTEM SET max_parallel_maintenance_workers = '4';
+2023-11-30 12:53:36,056 [INFO]: parma_name=max_parallel_workers_per_gather, param value=0.25
+2023-11-30 12:53:36,057 [INFO]: Executing : ALTER SYSTEM SET max_parallel_workers_per_gather = '4';
+2023-11-30 12:53:36,829 [INFO]: Executed : ALTER SYSTEM SET max_parallel_workers_per_gather = '4';
+2023-11-30 12:53:36,830 [INFO]: parma_name=listen_addresses, param value=*
+2023-11-30 12:53:36,831 [INFO]: Executing : ALTER SYSTEM SET listen_addresses = '*';
+2023-11-30 12:53:37,544 [INFO]: Executed : ALTER SYSTEM SET listen_addresses = '*';
+2023-11-30 12:53:37,546 [INFO]: parma_name=max_connections, param value=100
+2023-11-30 12:53:37,548 [INFO]: Executing : ALTER SYSTEM SET max_connections = '100';
+2023-11-30 12:53:38,326 [INFO]: Executed : ALTER SYSTEM SET max_connections = '100';
+2023-11-30 12:53:38,327 [INFO]: parma_name=work_mem, param value=4GB
+2023-11-30 12:53:38,328 [INFO]: Executing : ALTER SYSTEM SET work_mem = '4GB';
+2023-11-30 12:53:39,042 [INFO]: Executed : ALTER SYSTEM SET work_mem = '4GB';
+2023-11-30 12:53:39,045 [INFO]: parma_name=statement_timeout, param value=0
+2023-11-30 12:53:39,046 [INFO]: Executing : ALTER SYSTEM SET statement_timeout = '0';
+2023-11-30 12:53:39,838 [INFO]: Executed : ALTER SYSTEM SET statement_timeout = '0';
+2023-11-30 12:53:39,840 [INFO]: parma_name=lock_timeout, param value=0
+2023-11-30 12:53:39,841 [INFO]: Executing : ALTER SYSTEM SET lock_timeout = '0';
+2023-11-30 12:53:40,709 [INFO]: Executed : ALTER SYSTEM SET lock_timeout = '0';
+2023-11-30 12:53:40,709 [INFO]: parma_name=idle_in_transaction_session_timeout, param value=0
+2023-11-30 12:53:40,710 [INFO]: Executing : ALTER SYSTEM SET idle_in_transaction_session_timeout = '0';
+2023-11-30 12:53:41,767 [INFO]: Executed : ALTER SYSTEM SET idle_in_transaction_session_timeout = '0';
+2023-11-30 12:53:41,769 [INFO]: parma_name=archive_mode, param value=off
+2023-11-30 12:53:41,770 [INFO]: Executing : ALTER SYSTEM SET archive_mode = 'off';
+2023-11-30 12:53:42,804 [INFO]: Executed : ALTER SYSTEM SET archive_mode = 'off';
+2023-11-30 12:53:42,806 [INFO]: parma_name=synchronous_standby_names, param value=
+2023-11-30 12:53:42,807 [INFO]: Executing : ALTER SYSTEM SET synchronous_standby_names = '';
+2023-11-30 12:53:43,550 [INFO]: Executed : ALTER SYSTEM SET synchronous_standby_names = '';
+2023-11-30 12:53:43,551 [INFO]: parma_name=synchronous_commit, param value=off
+2023-11-30 12:53:43,552 [INFO]: Executing : ALTER SYSTEM SET synchronous_commit = 'off';
+2023-11-30 12:53:44,356 [INFO]: Executed : ALTER SYSTEM SET synchronous_commit = 'off';
+2023-11-30 12:53:44,358 [INFO]: parma_name=temp_buffers, param value=512MB
+2023-11-30 12:53:44,359 [INFO]: Executing : ALTER SYSTEM SET temp_buffers = '512MB';
+2023-11-30 12:53:45,131 [INFO]: Executed : ALTER SYSTEM SET temp_buffers = '512MB';
+2023-11-30 12:53:45,133 [INFO]: parma_name=effective_io_concurrency, param value=50
+2023-11-30 12:53:45,134 [INFO]: Executing : ALTER SYSTEM SET effective_io_concurrency = '50';
+2023-11-30 12:53:45,899 [INFO]: Executed : ALTER SYSTEM SET effective_io_concurrency = '50';
+2023-11-30 12:53:45,901 [INFO]: parma_name=autovacuum, param value=off
+2023-11-30 12:53:45,901 [INFO]: Executing : ALTER SYSTEM SET autovacuum = 'off';
+2023-11-30 12:53:46,665 [INFO]: Executed : ALTER SYSTEM SET autovacuum = 'off';
+2023-11-30 12:53:46,667 [INFO]: Database paramgters are reconfigured successfully
+2023-11-30 12:53:46,669 [INFO]: Task # 10, Task Name : Configure_Database_Parameters, Status : Completed, Elapse Duration: 00:00:19
+2023-11-30 12:53:46,669 [INFO]: **********************************************************************************************
+2023-11-30 12:53:56,685 [INFO]: Total Elapse Duration: 00:21:40
+2023-11-30 12:53:59,030 [INFO]: ===============================================================
+2023-11-30 12:53:59,030 [INFO]: Task # 11, Task Name : Restart_Database_Service, Status : In Progress
+2023-11-30 12:53:59,030 [INFO]: Restart Database Service
+2023-11-30 12:53:59,030 [INFO]: Command executing: sudo systemctl restart edb-as-11
+2023-11-30 12:54:00,221 [INFO]: Connected (version 2.0, client OpenSSH_7.4)
+2023-11-30 12:54:01,812 [INFO]: Authentication (password) successful!
+2023-11-30 12:54:03,446 [INFO]: Command executed: sudo systemctl restart edb-as-11
+2023-11-30 12:54:33,461 [INFO]: Database service is restarted successfully.
+2023-11-30 12:54:33,462 [INFO]: Task # 11, Task Name : Restart_Database_Service, Status : Completed, Elapse Duration: 00:00:34
+2023-11-30 12:54:33,462 [INFO]: **********************************************************************************************
