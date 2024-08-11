@@ -55,6 +55,7 @@ class EnvVariables:
         self.MACHINE_TYPE_NAME = os.getenv("MACHINE_TYPE_NAME")
         self.VM_NAME_PREFIX = os.getenv("VM_NAME_PREFIX")
         self.DATA_DISK_NAME_PREFIX = os.getenv("DATA_DISK_NAME_PREFIX")
+        self.DATA_DISK_BUFFER_STORAGE_GB = os.getenv("DATA_DISK_BUFFER_STORAGE_GB")
         self.BOOT_DISK_NAME = os.getenv("BOOT_DISK_NAME")
         self.DB_SERVICE_NAME = os.getenv("DB_SERVICE_NAME")
         self.SSH_USER = os.getenv("SSH_USER")
@@ -63,6 +64,7 @@ class EnvVariables:
 
         self.DUMP_BINARY = os.getenv("DUMP_BINARY")
         self.DB_DATA_DIR = os.getenv("DB_DATA_DIR")
+        self.TURN_OFF_PG_PARAMS = os.getenv("TURN_OFF_PG_PARAMS")
         self.DB_NAME = os.getenv("DB_NAME")
         self.DB_USER = os.getenv("DB_USER")
         self.DB_PORT = os.getenv("DB_PORT")
@@ -127,7 +129,13 @@ class EnvVariables:
         self.EMAIL_PASS_AUTH_ENABLED = os.getenv("EMAIL_PASS_AUTH_ENABLED")
         self.EMAIL_SUBJECT = os.getenv("EMAIL_SUBJECT")
 
+        # API
+        self.PENDING_VOUCHER_CHECK_API = os.getenv("PENDING_VOUCHER_CHECK_API")
         
+        # Disk Snapshot
+        self.SNAPSHOT_PREFIX = os.getenv("SNAPSHOT_PREFIX")
+        self.SNAPSHOT_RETENTION_DAYS = os.getenv("SNAPSHOT_RETENTION_DAYS")
+
 def get_variables():
     try:
         env_variable = EnvVariables()

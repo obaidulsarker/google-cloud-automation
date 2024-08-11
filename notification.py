@@ -127,6 +127,8 @@ class notification(Logger):
                 total_duration=operation_master_data[0].total_duration,
                 dump_file=operation_master_data[0].output_dump_file,
                 disk_snapshot_name=operation_master_data[0].output_data_disk_snapshot,
+                has_pending_voucher=operation_master_data[0].has_pending_voucher,
+                office_list=operation_master_data[0].office_list,
                 task_list=operation_detail_data
             )
 

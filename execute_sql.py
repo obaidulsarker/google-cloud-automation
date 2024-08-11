@@ -1,4 +1,5 @@
 import psycopg2
+import pandas as pd
 from psycopg2 import OperationalError
 import xml.etree.ElementTree as ET
 from init_variables import get_variables
@@ -40,6 +41,25 @@ class DatabaseExecutor(Logger):
             self.log_error(f"Exception: {str(e)}")
             return None  # Error
 
+    def connect_source(self):
+        try:
+            
+            connection = psycopg2.connect(
+                database=self.database,
+                user=self.user,
+                password=self.secret_value,
+                host=get_variables().SOURCE_VM_IP,
+                port=self.port,
+                connect_timeout = 3600
+            )
+            connection.autocommit=True
+
+            return connection  # Success
+        except OperationalError as e:
+            print(f"Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return None  # Error
+        
     def test_connection(self):
         try:
             connection = psycopg2.connect(
@@ -91,6 +111,96 @@ class DatabaseExecutor(Logger):
             self.log_error(f"Exception: {str(e)}")
             return False  # Error
 
+    def return_df(self, query):
+        try:
+            self.log_info(f"Executing : {query}")
+            print(f"Executing : {query}")
+
+            conn = self.connect()
+            df = pd.read_sql(query, conn)
+
+            #self.connection.commit()
+            conn.close()
+            self.log_info(f"Executed : {query}")
+            print(f"Executed : {query}")
+            return df  # Success
+        except OperationalError as e:
+            print(f"SQL Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return None  # Error
+
+    def return_df_from_soruce(self, query):
+        try:
+            self.log_info(f"Executing : {query}")
+            print(f"Executing : {query}")
+
+            conn = self.connect_source()
+
+            df = pd.read_sql(query, conn)
+
+            #self.connection.commit()
+            conn.close()
+            self.log_info(f"Executed : {query}")
+            print(f"Executed : {query}")
+            return df  # Success
+        except OperationalError as e:
+            print(f"SQL Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return None  # Error
+        
+    def log_office_list(self):
+        try:
+            sql ="SELECT office_info_id FROM smalldb_office_list"
+            df = self.return_df_from_soruce(sql)
+
+            #office_list = df[0].to_string()
+            office_list = df.iloc[0, 0]
+
+            print(f"Office List: {office_list}")
+            self.log_info(f"Office List: {office_list}")
+            
+            # if df.shape[0]>0: # Check rows
+            #     office_list = df[0].to_string()
+            #     print(f"Office List: {office_list}")
+            #     self.log_info(f"Office List: {office_list}")
+            # else:
+            #     print(f"Office List: <>")
+            #     self.log_info(f"Office List: <>")
+
+        except OperationalError as e:
+            print(f"SQL Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return None  # Error
+
+    # Get Office List
+    def get_office_list(self):
+        try:
+            sql ="SELECT office_info_id FROM smalldb_office_list"
+            df = self.return_df_from_soruce(sql)
+
+            #print(df)
+
+            #office_list = df["office_info_id"]
+            office_list = df.iloc[0, 0]
+
+            print(f"Office List: {office_list}")
+            self.log_info(f"Office List: {office_list}")
+            
+            # if df.shape[0]>0: # Check rows
+            #     office_list = df[0].to_string()
+            #     print(f"Office List: {office_list}")
+            #     self.log_info(f"Office List: {office_list}")
+            # else:
+            #     print(f"Office List: <>")
+            #     self.log_info(f"Office List: <>")
+        
+            return office_list
+        
+        except OperationalError as e:
+            print(f"SQL Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return None  # Error
+        
     def execute_procedure(self, query):
         try:
             self.log_info(f"Executing : {query}")
@@ -159,6 +269,30 @@ class DatabaseExecutor(Logger):
             self.log_error(f"Exception: {str(e)}")
             return []
 
+    def get_database_list(self):
+        try:
+            cursor = self.connect().cursor()
+            # Get a list of all user schemas
+            sql ="""
+                SELECT datname FROM pg_database WHERE datistemplate = false 
+                """
+            cursor.execute(sql)
+            db_lst = cursor.fetchall()
+
+            # Extract schema names from the result
+            database_list = [row[0] for row in db_lst]
+
+            # Close the cursor and the connection
+            cursor.close()
+
+            # Return schema list
+            return database_list
+        
+        except OperationalError as e:
+            print(f"Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return []
+        
     def drop_schemas(self):
         try:
             # Connect to the PostgreSQL database
@@ -429,6 +563,53 @@ class DatabaseExecutor(Logger):
             print (f"Exception: {str(e)}")
             return None
 
+    # Execute VACCUMDB command on databases
+    def vaccum_databases(self):
+        try:
+            # Schema List
+            databases = self.get_database_list()
+
+            # Shell Executor
+            sh = ShellOperation(self.operation_log)
+
+            # VACCUMDB
+            for db in databases:
+                #print(schema)
+                self.log_info(f"Executing vaccumdb: {db}")
+                print(f"Executing vaccumdb: {db}")
+                result = sh.execute_vaccumdb(dbname=db)
+                self.log_info(f"Executed vaccumdb: {db}")
+                print(f"Executed vaccumdb: {db}")
+                time.sleep(5)
+                
+            return True  # Success
+
+        except OperationalError as e:
+            print(f"Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return False  # Error
+
+    # Update Sequecnes 
+    def update_sequences(self):
+        try:
+
+            # Shell Executor
+            sh = ShellOperation(self.operation_log)
+            sql = "call sp_smdb_validation_sequence_update_main()"
+            self.log_info(f"Executing : {sql}")
+            print(f"Executing : {sql}")
+            result = sh.execute_stored_procedure_function(sql_exec_command=sql)
+            self.log_info(f"Executed : {sql}")
+            print(f"Executed : {sql}")
+            time.sleep(5)
+                
+            return True  # Success
+
+        except OperationalError as e:
+            print(f"Error: {e}")
+            self.log_error(f"Exception: {str(e)}")
+            return False  # Error
+            
 # if __name__ == "__main__":
 
 #     operation_log="logs\log_5af7fd65-8edd-444d-ab1d-68909f8bda0a_2023-10-23_19-18-34.log"

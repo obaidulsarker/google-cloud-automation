@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 
 class email_template(Logger):
-    def __init__(self, logfile, operation_id, operation_start_datetime, operation_end_datetime, operation_status, total_duration, total_task, completed_tasks, dump_file, disk_snapshot_name, task_list) -> None:
+    def __init__(self, logfile, operation_id, operation_start_datetime, operation_end_datetime, operation_status, total_duration, total_task, completed_tasks, dump_file, disk_snapshot_name, has_pending_voucher, office_list, task_list) -> None:
         super().__init__(logfile)
         self.operation_id = operation_id
         self.operation_start_datetime = operation_start_datetime 
@@ -16,6 +16,8 @@ class email_template(Logger):
         self.completed_tasks = completed_tasks
         self.dump_file = dump_file
         self.disk_snapshot_name = disk_snapshot_name
+        self.has_pending_voucher = has_pending_voucher
+        self.office_list = office_list
         self.task_list= task_list
         self.email_template_file = get_variables().EMAIL_TEMPLATE
         self.task_tr = """<tr style="height: 18px;">
@@ -126,6 +128,8 @@ class email_template(Logger):
             template = template.replace("{completed_tasks}", str(self.completed_tasks))
             template = template.replace("{dump_file}", str(self.dump_file))
             template = template.replace("{disk_snapshot_name}", str(self.disk_snapshot_name))
+            template = template.replace("{has_pending_voucher}", str(self.has_pending_voucher))
+            template = template.replace("{office_list}", str(self.office_list))
             template = template.replace("{task_list}", task_tr_lst)
 
             email_body = template

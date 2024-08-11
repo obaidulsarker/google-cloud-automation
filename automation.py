@@ -101,20 +101,45 @@ class Automation(Logger):
                                                  total_passed_tasks=0,
                                                  total_tasks=len(self.task_list),
                                                  output_data_disk_snapshot=None,
-                                                 output_dump_file=None
+                                                 output_dump_file=None,
+                                                 office_list = "",
+                                                 has_pending_voucher = ""
                                                  )
             
             operation_db_instance = operation_db(operation_log=operation_log, 
                                                  operation_master=operationMasterObj,
                                                  task_lst=self.task_list
                                                  )
+            
+            # Update Operation database
             load_status = operation_db_instance.setup_operation_database()
+
+            # Check Pending Voucher 
+            self.log_info("CHECK:: PENDING VOCUHER STATUS:")
+            print("CHECK:: PENDING VOCUHER STATUS:")
+            office_ids_lst = sql_instance.get_office_list()
+            operation_db_instance.operation_master.office_list = office_ids_lst
+            has_pending_voucher = operation_db_instance.has_pending_voucher(office_list=office_ids_lst)
+            if (has_pending_voucher is True):
+                operation_db_instance.operation_master.has_pending_voucher = "YES"
+            elif (has_pending_voucher is False):
+                operation_db_instance.operation_master.has_pending_voucher = "NO"
+            else:
+                operation_db_instance.operation_master.has_pending_voucher = "ERROR"
+
+            self.log_info(f"Has Pending Voucher :: {operation_db_instance.operation_master.has_pending_voucher}")
+            print(f"Has Pending Voucher :: {operation_db_instance.operation_master.has_pending_voucher}")
+
+            # update operational DB
+            upd_operation_status = operation_db_instance.update_operation_master()
 
             # Glabal task 
             current_task = None
 
             if (load_status!=True):
                 raise Exception("Unable to initilize operational databaes!")
+
+            
 
             task_indx = -1
             for task in operation_db_instance.operation_detail_lst:
@@ -248,14 +273,20 @@ class Automation(Logger):
                 elif (task_name=="Remove_Recovery_Conf_File"): #7
                     
                     # remove recovery file
-                    ssh_command_remove_recovery_file=f"sudo rm -rf {get_variables().DB_DATA_DIR}/recovery.conf"
+                    ssh_command_remove_recovery_file=f"sudo rm -rf {get_variables().DB_DATA_DIR}/standby.signal"
                     ssh_command_status= sh.shell_command(command=ssh_command_remove_recovery_file)
 
                     # update pg_hba file
                     pg_hba_status = sh.update_pg_hba_config_file()
 
-                    # Disable Archive log 
-
+                    # Comment out paramters
+                    pg_config_file = "postgresql.conf"
+                    disable_parameters=str.lower(get_variables().TURN_OFF_PG_PARAMS)
+                    parameters_list = disable_parameters.split(',')
+                    for parameter in parameters_list:
+                        if (parameter!=""):
+                            parm_status = sh.comment_out_paramters(file_name=pg_config_file,param_to_comment_out=parameter,commented_param='# ')
+                            
                     # restart DB service
                     command = f"sudo systemctl restart {db_service_name}"
                     db_start = sh.shell_command(command)
@@ -458,6 +489,10 @@ class Automation(Logger):
                         task.task_status="Completed"
 
                 elif (task_name=="Execute_Xml_Sql"): # 18
+
+                    # Log Office List
+                    #office_list_log = sql_instance.log_office_list()
+
                     sql_xml_file = sql_instance.execute_sql_xml()
 
                     if (sql_xml_file==None):
@@ -482,6 +517,36 @@ class Automation(Logger):
                         raise Exception("Unable to drop schema!")
                     else:
                         total_passed_tasks = total_passed_tasks + 1
+                        task.task_status="Completed"
+
+                    time.sleep(10)
+
+                    # Run Vaccum process
+                    vaccum_db=sql_instance.vaccum_databases()
+                    if (vaccum_db==False):
+                        task.task_status="Failed"
+                        task.remarks="Unable to execute vaccumdb!"
+                        current_task = task
+                        self.log_error("Unable to execute vaccumdb!")
+                        print("Unable to execute vaccumdb!")
+                        raise Exception("Unable to execute vaccumdb!")
+                    else:
+                        #total_passed_tasks = total_passed_tasks + 1
+                        task.task_status="Completed"
+
+                    time.sleep(10)
+
+                    # Update Sequences
+                    upd_sequences=sql_instance.update_sequences()
+                    if (upd_sequences==False):
+                        task.task_status="Failed"
+                        task.remarks="Unable to update sequences!"
+                        current_task = task
+                        self.log_error("Unable to update sequences!")
+                        print("Unable to update sequences!")
+                        raise Exception("Unable to update sequences!")
+                    else:
+                        #total_passed_tasks = total_passed_tasks + 1
                         task.task_status="Completed"
 
                     time.sleep(10)
@@ -525,7 +590,7 @@ class Automation(Logger):
                         current_task = task
                         self.log_error(f"Unable to upload public schema dump to {bucket_name}/{bucket_dest_location}")
                         print(f"Unable to upload public schema dump to {bucket_name}/{bucket_dest_location}")
-                        raise Exception(f"Unable to upload public schema dump to {bucket_name}/{bucket_dest_location}")
+                        #raise Exception(f"Unable to upload public schema dump to {bucket_name}/{bucket_dest_location}")
                     else:
                         total_passed_tasks = total_passed_tasks + 1
                         task.task_status="Completed"
@@ -541,7 +606,7 @@ class Automation(Logger):
                         current_task = task
                         self.log_error(f"Unable to upload archive schema dump to {bucket_name}/{bucket_dest_location}")
                         print(f"Unable to upload archive schema dump to {bucket_name}/{bucket_dest_location}")
-                        raise Exception(f"Unable to upload archive schema dump to {bucket_name}/{bucket_dest_location}")
+                        #raise Exception(f"Unable to upload archive schema dump to {bucket_name}/{bucket_dest_location}")
                     else:
                         total_passed_tasks = total_passed_tasks + 1
                         task.task_status="Completed"
@@ -557,7 +622,7 @@ class Automation(Logger):
                     # Get Usage of existing Data disk
                     data_disk_mount_point = get_variables().DATA_DISK_MOUNT_POINT
                     data_disk_usage = sh.calculate_used_storage_gb(mount_point=data_disk_mount_point)
-                    data_disk_usage = int(data_disk_usage) + 50 # add buffer 50GB
+                    data_disk_usage = int(data_disk_usage) + int(get_variables().DATA_DISK_BUFFER_STORAGE_GB) # add buffer 150GB
                     # Create new data disk
                     data_disk_prefix=get_variables().DATA_DISK_NAME_PREFIX
                     new_disk_name =f"{instance_name}-{data_disk_prefix}-{date_string}"
@@ -616,9 +681,24 @@ class Automation(Logger):
                         task.task_status="Completed"
                         print(f"Data Sync is done from {source_dir} to {target_dir}")
                         self.log_info(f"Data Sync is done from {source_dir} to {target_dir}")
+                    
+                    time.sleep(300)
+
+                    # # Restart the server
+                    # # Stop DB service
+                    # command = f"sudo reboot"
+                    # db_service_status = sh.shell_command(command)
+
+                    # time.sleep(300)
+
+                    # # Stop DB service
+                    # command = f"sudo systemctl stop {db_service_name}"
+                    # db_service_status = sh.shell_command(command)
+
+                    # time.sleep(120)
 
                     # Unmount old data disk 
-                    command = f"sudo umount {source_dir}"
+                    command = f"sudo umount -f {source_dir}"
                     unmount_status = sh.shell_command(command)
 
                     # # Detach /data disk
@@ -634,7 +714,8 @@ class Automation(Logger):
                     # delete_old_data_disk = gcp_compute_instance.delete_disk(disk_name=detach_old_disk_name)
 
                     # Unmount /data2
-                    command = f"sudo umount {target_dir}"
+                    time.sleep(300)
+                    command = f"sudo umount -f {target_dir}"
                     unmount_status = sh.shell_command(command)
 
                     # Mount data disk as /data 
@@ -692,6 +773,17 @@ class Automation(Logger):
                         print("Unable to remove machine image!")
                         raise Exception("Unable to remove machine image!")
                     else:
+                        # Remove older disk snapshoot
+                        snapshot_prefix=f"{get_variables().SNAPSHOT_PREFIX}-smalldb"
+                        snapshot_retention_days = get_variables().SNAPSHOT_RETENTION_DAYS
+                        disk_snapshot_deletion_status=gcp_compute_instance.delete_old_snapshots(prefix=snapshot_prefix, days_old=snapshot_retention_days)
+                        if (disk_snapshot_deletion_status==True):
+                            self.log_info("Older snapshots have been removed.")
+                            print("Older snapshots have been removed.")
+                        else:
+                            self.log_error("Unable to remove disk snapshots!")
+                            print("Unable to remove disk snapshots!")
+
                         total_passed_tasks = total_passed_tasks + 1
                         task.task_status="Completed"
 
@@ -831,7 +923,7 @@ class Automation(Logger):
                 operation_db_instance.operation_master.output_data_disk_snapshot = data_disk_snapshoot_name
             
                 upd_operation_status = operation_db_instance.update_operation_master()
-
+            
             # upload log
             self.upload_log()
 

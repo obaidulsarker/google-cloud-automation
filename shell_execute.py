@@ -112,6 +112,45 @@ class ShellOperation(Logger):
         finally:
             return status
 
+    # Comment out PostgreSQL paramters
+    def comment_out_paramters(self, file_name, param_to_comment_out, commented_param = '# '):
+
+        try:
+            status = False
+
+            # generate command
+            data_dir = get_variables().DB_DATA_DIR
+            file_path= data_dir +"/"+file_name
+            #command = f"sed -i 's/^{param_to_comment_out}/{commented_param}/' {file_path}"
+            command = f"sudo sed -i 's/^{param_to_comment_out}/{commented_param}{param_to_comment_out}/' {file_path}"
+
+            print(f"Command executing: {command}")
+            self.log_info(f"Command executing: {command}")
+
+            stdin, stdout, stderr = self.ssh_connect().exec_command(command)
+
+            result = stdout.read().decode("utf-8")
+            stderr_data = stderr.read().decode("utf-8")
+
+            if len(stderr_data.strip())>0:
+                self.log_error(stderr_data)
+                self.log_error(f"Failed: {command}")
+                raise Exception("Failed to execute command")
+            
+            # Print the output of the command
+            print(f"Command executed: {command}")
+            self.log_info(f"Command executed: {command}")
+
+            status = True
+
+        except Exception as e:
+            print(f"Error occured: {command}")
+            print(f"Error: {e}")
+            self.log_error(f"Error occured: {command}")
+            self.log_error(f"Error: {e}")
+            status = False
+        finally:
+            return status
     # Execute shell command
     def shell_command_without_log(self, command, remarks):
 
@@ -197,10 +236,10 @@ class ShellOperation(Logger):
             sftp = self.ssh_connect().open_sftp()
             sftp.put(f'{new_hba_file}', f'{hba_file_tmp}')
             
-            command = f"sudo rm {hba_file}"
+            command = f"sudo rm -rf {hba_file}"
             status = self.shell_command(command=command)
 
-            command = f"sudo cp {hba_file_tmp} {hba_file}"
+            command = f"sudo cp -f {hba_file_tmp} {hba_file}"
             status = self.shell_command(command=command)
 
             # with open('conf/pg_hba.conf', 'r') as file:
@@ -370,7 +409,7 @@ class ShellOperation(Logger):
         try:
             
             # Check Existance of Directory
-            command = f"systemctl is-active {service_name}"
+            command = f"sudo systemctl is-active {service_name}"
 
             # Execute   
             stdin, stdout, stderr = self.ssh_connect().exec_command(command)
@@ -395,6 +434,58 @@ class ShellOperation(Logger):
                 
     # Mount a Disk
     def mount_disk(self, device_name, mount_point, is_new_disk=False):
+        try:
+            
+            # Check Disk already mounted or not
+            mount_status = self.check_disk_mount_status(device_name=device_name)
+            if (mount_status==True):
+                print(f"Device {device_name} already mounted to {mount_point}")
+                self.log_info(f"Device {device_name} already mounted to {mount_point}")
+                return True
+            
+            # Check directory Existance
+            if (is_new_disk==True):
+                # Format disk
+                #command = f"sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/{device_name}"
+                command = f"sudo mkfs.ext4 /dev/{device_name}"
+                format_status = self.shell_command(command)
+
+                command = f"sudo mkdir -p {mount_point}"
+                create_target_dir = self.shell_command(command)
+                
+                # directory = self.check_directory_existance(directory_full_path=mount_point)
+                # if (directory==False):
+                #     command = f"sudo mkdir -p {mount_point}"
+                #     create_target_dir = self.shell_command(command)
+                #     if (create_target_dir==False):
+                #         raise Exception(f"Unable to create new directory {mount_point}")
+     
+
+            # Mount the disk 
+            command = f"sudo mount -o discard,defaults /dev/{device_name} {mount_point}"
+            mount_status = self.shell_command(command)
+
+            #stdin, stdout, stderr = self.ssh_connect().exec_command(command)
+
+            # if stderr.read():
+            #     self.log_error(f"Failed: {command}")
+            #     print(f"Failed: {command}")
+            #     return False
+
+            # print(f"Command executed: {command}")
+            # self.log_info(f"Command executed: {command}")
+
+            if (is_new_disk==True):
+                command = f"sudo chmod a+w {mount_point}"
+                permission_status = self.shell_command(command)
+
+            return True
+        except Exception as e:
+            self.log_error(f"Error: {e}")
+            print(f"Error: {e}")
+            return False
+
+    def mount_disk_xfs(self, device_name, mount_point, is_new_disk=False):
         try:
             
             # Check Disk already mounted or not
@@ -444,8 +535,7 @@ class ShellOperation(Logger):
         except Exception as e:
             self.log_error(f"Error: {e}")
             print(f"Error: {e}")
-            return False
-        
+            return False    
     # Get UUID for a HDD
     def get_hdd_device_uuid(self, boot_disk):
         try:
@@ -726,14 +816,14 @@ class ShellOperation(Logger):
             self.log_info(f"Uploaded file: {service_account_key}")
 
             # Step 2: Activate gcloud authentication
-            shell_cmd = "gcloud auth activate-service-account --key-file=service_account_key.json"
+            shell_cmd = "sudo gcloud auth activate-service-account --key-file=service_account_key.json"
             output_shell = self.shell_command(shell_cmd)
             print(f"gclloud authenication = {output_shell}")
             self.log_info(f"gclloud authenication = {output_shell}")
 
             # Step 3: Upload file
             trg_directory = f"{bucket_name}/{dest_location}"
-            shell_cmd = f"""gsutil cp "{src_file}" "gs://{trg_directory}" """
+            shell_cmd = f"""sudo gsutil cp "{src_file}" "gs://{trg_directory}" """
             output_shell = self.shell_command(shell_cmd)
 
             # Read File Size
@@ -1083,7 +1173,60 @@ sudo {RESTORE_BINARY} --host {DB_SERVER} --port {DB_PORT} --username {DB_USER} -
             self.log_error(f"Error occured: {command_print}")
             self.log_error(f"Error: {e}")
             return False  
-              
+
+     # Execute VACCUMDB command
+    def execute_vaccumdb(self, dbname):
+
+        RESTORE_BINARY=f"{get_variables().DUMP_BINARY}/vacuumdb"
+        DB_SERVER = "localhost"
+        #DB_NAME = get_variables().DB_NAME
+        DB_NAME = dbname
+        DB_PORT = get_variables().DB_PORT
+        DB_USER = get_variables().DB_USER
+        #DB_USER_PASS = get_variables().DB_USER_PASS
+        LOG_FILE="vaccumdb.log"
+
+        command = f"""
+sudo PGPASSWORD='{self.db_password}' {RESTORE_BINARY} --host {DB_SERVER} --port {DB_PORT} --username {DB_USER} -d {DB_NAME} --analyze --verbose 2>> {LOG_FILE}
+"""     
+        command_print = f"""
+sudo {RESTORE_BINARY} --host {DB_SERVER} --port {DB_PORT} --username {DB_USER} -d {DB_NAME} --analyze --verbose 2>> {LOG_FILE}
+"""
+        try:
+
+            #status = self.shell_command(command)
+
+            stdin, stdout, stderr = self.ssh_connect().exec_command(command)
+            
+            output_msg = stdout.read().decode("utf-8")
+            status = bool(output_msg)
+            stderr_data = stderr.read().decode("utf-8")
+
+            # write output msg
+            if len(output_msg.strip())>0:
+                self.log_info(f"output = {output_msg}")
+                print(output_msg)
+
+            # write error msg
+            if len(stderr_data.strip())>0:
+                self.log_error(f"Failed: {command_print}")
+                self.log_error(stderr_data)
+                print(stderr_data)
+                raise Exception(f"Failed to execute vaccumdb on {dbname}!")
+            
+            if (status):
+                self.log_info(f"vaccumdb on {dbname} is executed successfully.")
+                print(f"vaccumdb on {dbname} is executed successfully.")
+
+            return status
+        
+        except Exception as e:
+            print(f"Error occured: {command_print}")
+            print(f"Error: {e}")
+            self.log_error(f"Error occured: {command_print}")
+            self.log_error(f"Error: {e}")
+            return False 
+           
 # if __name__ == "__main__":
 
 #     operation_log="logs\log_928c2183-c22e-4085-8658-2675bcf2085f_2023-10-31_12-39-06.log"

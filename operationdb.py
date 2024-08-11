@@ -1,10 +1,11 @@
 import sqlite3
 from init_variables import get_variables
 from logger import Logger
+import requests
 
 # operation master class
 class OperationMaster:
-    def __init__(self, operation_id, operation_log, start_datetime, end_datetime, total_duration, operation_status, source_database_vm_name, source_database_vm_ip, total_tasks, total_passed_tasks, output_dump_file, output_data_disk_snapshot):
+    def __init__(self, operation_id, operation_log, start_datetime, end_datetime, total_duration, operation_status, source_database_vm_name, source_database_vm_ip, total_tasks, total_passed_tasks, output_dump_file, output_data_disk_snapshot, office_list, has_pending_voucher):
         self.operation_id =  operation_id
         self.operation_log = operation_log
         self.start_datetime=start_datetime
@@ -17,6 +18,8 @@ class OperationMaster:
         self.total_passed_tasks = total_passed_tasks
         self.output_dump_file = output_dump_file
         self.output_data_disk_snapshot = output_data_disk_snapshot
+        self.office_list=office_list 
+        self.has_pending_voucher=has_pending_voucher
 
 # operation detail class
 class OperationDetail:
@@ -46,6 +49,10 @@ class OperationMasterData(Logger):
         self.total_passed_tasks = OperationMasterObj.total_passed_tasks
         self.output_dump_file = OperationMasterObj.output_dump_file
         self.output_data_disk_snapshot = OperationMasterObj.output_data_disk_snapshot
+        self.office_list = OperationMasterObj.office_list
+        self.has_pending_voucher=OperationMasterObj.has_pending_voucher
+
+        self.pending_voucher_check_api=get_variables().PENDING_VOUCHER_CHECK_API
         self.db = get_variables().AUTOMATION_DB
 
     def connect(self):
@@ -66,8 +73,8 @@ class OperationMasterData(Logger):
         try:
             cursor = self.connect().cursor()
             sql = f"""INSERT INTO operation (operation_id, operation_log, start_datetime, end_datetime, total_duration, operation_status, source_database_vm_name, source_database_vm_ip, 
-            total_tasks, total_passed_tasks, output_dump_file, output_data_disk_snapshot)
-            VALUES ('{self.operation_id}', '{self.operation_log}', '{self.start_datetime}', '{self.end_datetime}', '{self.total_duration}', '{self.operation_status}', '{self.source_database_vm_name}', '{self.source_database_vm_ip}', '{self.total_tasks}', '{self.total_passed_tasks}', '{self.output_dump_file}', '{self.output_data_disk_snapshot}');
+            total_tasks, total_passed_tasks, output_dump_file, output_data_disk_snapshot, office_list, has_pending_voucher)
+            VALUES ('{self.operation_id}', '{self.operation_log}', '{self.start_datetime}', '{self.end_datetime}', '{self.total_duration}', '{self.operation_status}', '{self.source_database_vm_name}', '{self.source_database_vm_ip}', '{self.total_tasks}', '{self.total_passed_tasks}', '{self.output_dump_file}', '{self.output_data_disk_snapshot}', '{self.office_list}', '{self.has_pending_voucher}');
             """
             #print(sql)
             cursor.execute(sql)
@@ -191,6 +198,20 @@ class OperationMasterData(Logger):
                 else:
                     sql_upd_col = sql_upd_col + f", output_data_disk_snapshot='{self.output_data_disk_snapshot}'"
                 col_no = col_no +1
+            
+            if (self.office_list!=None):
+                if (col_no==0):
+                    sql_upd_col = sql_upd_col + f" office_list='{self.office_list}'"
+                else:
+                    sql_upd_col = sql_upd_col + f", office_list='{self.office_list}'"
+                col_no = col_no +1
+
+            if (self.has_pending_voucher!=None):
+                if (col_no==0):
+                    sql_upd_col = sql_upd_col + f" has_pending_voucher='{self.has_pending_voucher}'"
+                else:
+                    sql_upd_col = sql_upd_col + f", has_pending_voucher='{self.has_pending_voucher}'"
+                col_no = col_no +1
 
             # concat
             sql = sql_upd_col +" "+ sql_where
@@ -220,6 +241,78 @@ class OperationMasterData(Logger):
             self.log_error(f"Exception: {str(e)}")
             return None
 
+    # Read API
+    def get_pending_voucher_status(self, office_id):
+        try:
+            # Define the API endpoint URL
+
+            office_id = office_id.strip()
+            # self.log_info(f"Office: {office_id}")
+            # print(f"Office: {office_id}")
+
+            url = f'{self.pending_voucher_check_api}/{office_id}'
+
+            # self.log_info(f"URL: {url}")
+            # print(f"URL: {url}")
+
+            # Make the API request
+            response = requests.get(url)
+
+            total_failed_vouchers = 0
+            # Check if the request was successful (status code 200)
+            if response.status_code == 200:
+
+                # Read the response data
+                data = response.json()  # Convert JSON response to Python dictionary
+
+                # Access individual fields
+                business_date = data['businessDate']
+                failed_request_count = data['failedRequestCount']
+                error_message = data['errorMessage']
+                inprogress_request_count = data['inprogressRequestCount']
+
+                total_failed_vouchers = int(failed_request_count) + int(inprogress_request_count)
+
+                #print("API response:", data)
+            else:
+                # Print error message if request was not successful
+                print("Error:", response.status_code, response.text)
+                self.log_info("Error:", response.status_code, response.text)
+
+            if (total_failed_vouchers>0):
+                return True
+            else:
+                return False    
+
+        except Exception as e:
+            print(f"Exception: {str(e)}")
+            self.log_error(f"Exception: {str(e)}")
+            return None
+
+    # Loop through office, Return office status
+    def read_office(self, office_list_str):
+        try:
+            status = False
+            office_list = office_list_str.split(',')
+            for office_id in office_list:
+                office_id=office_id.strip()
+                status = self.get_pending_voucher_status(office_id)
+                if status is True:
+                    break
+            
+            if (status is True):
+                self.has_pending_voucher="YES"
+            else:
+                self.has_pending_voucher="NO"
+
+            return status
+        
+        except Exception as e:
+            # self.has_pending_voucher="ERROR"
+            print(f"Exception: {str(e)}")
+            self.log_error(f"Exception: {str(e)}")
+            return None
+        
 # Operation Details
 class OperationDetailData(Logger):
     def __init__(self, logfile, OperationDetailObj):
@@ -234,7 +327,7 @@ class OperationDetailData(Logger):
         self.task_duration = OperationDetailObj.task_duration
         self.task_status = OperationDetailObj.task_status
         self.remarks = OperationDetailObj.remarks
-
+        
     def connect(self):
         try:
             connection = sqlite3.connect(self.db)
@@ -444,6 +537,7 @@ class operation_db:
             operation_master_data = OperationMasterData(logfile=self.operation_log, 
                                                         OperationMasterObj=self.operation_master)
             result= operation_master_data.create()
+
             if (result==False):
                 raise Exception("Unable to save operational master information into database!")
             
@@ -483,6 +577,18 @@ class operation_db:
             print(f"Exception: {str(e)}")
             return None
     
+    def has_pending_voucher(self, office_list):
+        try:
+            operation_master_data = OperationMasterData(logfile=self.operation_log, 
+                                                        OperationMasterObj=self.operation_master)
+            
+            status = operation_master_data.read_office(office_list_str=office_list)
+            
+            return status
+        except Exception as e:
+            print(f"Exception: {str(e)}")
+            return None
+        
     def update_operation_detail(self, OperationDetail):
         try:
             operation_detail_data = OperationDetailData(

@@ -2,7 +2,7 @@ from googleapiclient import discovery
 from google.cloud import secretmanager
 from google.oauth2 import service_account
 from google.auth import exceptions
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import time
 from logger import *
 from init_variables import get_variables
@@ -355,16 +355,27 @@ class VMoperation(Logger):
     # Create a Disk Snapshot
     def create_disk_snapshoot(self, disk_name):
         
+        print(f"Started disk snapshot deletion job")
+        self.log_info(f"Started disk snapshot deletion job")
+        
         now = datetime.now()
         dt_string = now.strftime("%Y%m%d%H%M%S")
 
+        # Snapshot Expiration Date
+        expiration_date = now + timedelta(days=10)
+        expiration_label = expiration_date.strftime('%Y-%m-%d')
+
         # snapshoot name
-        snapshot_name = f"snapshot-{disk_name}"
+        snapshot_prefix=get_variables().SNAPSHOT_PREFIX
+        snapshot_name = f"{snapshot_prefix}-{disk_name}"
 
         # Create snapshot request body
         request_body = {
             "name": snapshot_name,
-            "sourceDisk": f"projects/{self.project_id}/zones/{self.zone}/disks/{disk_name}"
+            "sourceDisk": f"projects/{self.project_id}/zones/{self.zone}/disks/{disk_name}",
+            'labels': {
+            'delete_after': expiration_label
+            }
         }
 
         try:
@@ -398,6 +409,53 @@ class VMoperation(Logger):
             
             
             return snapshot_name
+        
+        except Exception as e:
+            print(f"Error: {e}")
+            self.log_error(f"Error: {e}")
+            return None
+
+    # Remove older snapshots
+    def delete_old_snapshots(self, prefix, days_old=10):
+        try:
+            # Get the current time
+            #now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
+            
+            # Calculate the cutoff time
+            cutoff_time = now - timedelta(days=int(days_old))
+            
+            # Authenticate and build the compute service
+            #credentials, project = google.auth.default()
+            #service = build('compute', 'v1', credentials=credentials)
+            
+            # List all snapshots
+            request = self.connect().snapshots().list(project=self.project_id)
+            
+            while request is not None:
+                response = request.execute()
+                
+                if 'items' in response:
+                    for snapshot in response['items']:
+                        # Check if the snapshot name starts with the given prefix
+                        if snapshot['name'].startswith(prefix):
+                            # Parse the snapshot creation time
+                            creation_time_str = snapshot['creationTimestamp']
+                            creation_time = datetime.fromisoformat(creation_time_str.replace('Z', '+00:00'))
+                    
+                            # creation_time = datetime.strptime(snapshot['creationTimestamp'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                            
+                            # Check if the snapshot is older than the cutoff time
+                            if creation_time < cutoff_time:
+                                # Delete the snapshot
+                                self.log_info(f"Deleting snapshot: {snapshot['name']} (created on {creation_time})")
+                                print(f"Deleting snapshot: {snapshot['name']} (created on {creation_time})")
+                                delete_request = self.connect().snapshots().delete(project=self.project_id, snapshot=snapshot['name'])
+                                delete_request.execute()
+                                time.sleep(5)
+
+                request = self.connect().snapshots().list_next(previous_request=request, previous_response=response)
+            return True
         
         except Exception as e:
             print(f"Error: {e}")
